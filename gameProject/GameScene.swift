@@ -9,9 +9,11 @@
 import SpriteKit
 import GameplayKit
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var sprite : SKSpriteNode!
+    let spriteCategory1 : UInt32 = 0b1
+    let spriteCategory2 : UInt32 = 0b10
     
     private var label : SKLabelNode?
     private var spinnyNode : SKShapeNode?
@@ -20,6 +22,26 @@ class GameScene: SKScene {
         sprite = SKSpriteNode(imageNamed: "GameSprite")
         sprite.position = CGPoint(x: size.width / 2,y: size.height / 2)
         addChild(sprite)
+        
+        let opponentSprite = SKSpriteNode(imageNamed: "OpponentSprite")
+        opponentSprite.position = CGPoint(x: size.width / 2, y: size.height)
+        addChild(opponentSprite)
+        
+        let downMovement = SKAction.move(to: CGPoint(x: size.width / 2, y: 0), duration: 2)
+        let upMovement = SKAction.move(to: CGPoint(x: size.width / 2, y: size.height), duration: 2)
+        let movement = SKAction.sequence([downMovement, upMovement])
+        opponentSprite.run(SKAction.repeatForever(movement))
+        
+        sprite.physicsBody = SKPhysicsBody(circleOfRadius: 50)
+        opponentSprite.physicsBody = SKPhysicsBody(circleOfRadius: 50)
+        sprite.physicsBody?.categoryBitMask = spriteCategory1
+        sprite.physicsBody?.contactTestBitMask = spriteCategory1
+        sprite.physicsBody?.collisionBitMask = spriteCategory1
+        opponentSprite.physicsBody?.categoryBitMask = spriteCategory1
+        opponentSprite.physicsBody?.contactTestBitMask = spriteCategory1
+        opponentSprite.physicsBody?.collisionBitMask = spriteCategory1
+        
+        self.physicsWorld.contactDelegate = self
     }
     
     func touchDown(atPoint pos : CGPoint) {
